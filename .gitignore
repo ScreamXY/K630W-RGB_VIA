@@ -1,0 +1,19 @@
+# Private device data and generated artifacts: never publish these.
+/backups/
+/build/
+/evidence/
+/local/
+/.k630-local.json
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+*.dylib
+*.bin
+*.hex
+*.ihx
+*.elf
+*.map
+*.log
+.DS_Store

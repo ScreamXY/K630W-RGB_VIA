@@ -1,0 +1,2 @@
+# Unified patches require context-marker spaces before blank lines and tabs.
+patches/*.patch -whitespace

@@ -1,0 +1,172 @@
+diff --git a/platforms/mcs51/platform.mk b/platforms/mcs51/platform.mk
+index 539a01ca..211cc62a 100644
+--- a/platforms/mcs51/platform.mk
++++ b/platforms/mcs51/platform.mk
+@@ -84,9 +84,10 @@ bin: $(BUILD_DIR)/$(TARGET).bin
+ # Evision OEM bootloader: evision_oem_image.py makes the flash image, based at 0x2800, from the app linked at
+ # 0x3027: the LJMP at 0x2800, the interrupt table at 0x3000 and the check of the Esc key at power-up.
+ ifeq ($(strip $(BOOTLOADER)), evision-oem)
++EVISION_ESC_ROW ?= 0
+ $(BUILD_DIR)/$(TARGET).bin: $(BUILD_DIR)/$(TARGET).elf
+ 	@$(SILENT) || printf "$(MSG_BIN) $@" | $(AWK_CMD)
+-	$(eval CMD=python3 $(TOP_DIR)/util/evision_oem_image.py sdcc $(BUILD_DIR)/$(TARGET).ihx $(INTERMEDIATE_OUTPUT)/quantum/main.asm $@ --code-loc $(MCS51_CODE_LOC) --code-end $(CODE_SIZE))
++	$(eval CMD=python3 $(TOP_DIR)/util/evision_oem_image.py sdcc $(BUILD_DIR)/$(TARGET).ihx $(INTERMEDIATE_OUTPUT)/quantum/main.asm $@ --code-loc $(MCS51_CODE_LOC) --code-end $(CODE_SIZE) --esc-row $(EVISION_ESC_ROW))
+ 	@$(BUILD_CMD)
+ endif
+ 
+diff --git a/util/evision_flash.py b/util/evision_flash.py
+index f3b2e008..3087d92b 100755
+--- a/util/evision_flash.py
++++ b/util/evision_flash.py
+@@ -69,6 +69,7 @@ APP_VID, APP_PID = 0x320f, 0x5000
+ BOOT_VID, BOOT_PID = 0x0c45, 0x7687
+ QMK_IDS = {   # QMK redragon/<keyboard> (no Evision vendor interface)
+     (0x5244, 0x0580): "K580",
++    (0x5244, 0x0630): "K630 VS11K28A",
+     (0x5244, 0x0552): "K552",
+     (0x5244, 0x0551): "K551",
+     (0x5244, 0x0582): "K582",
+@@ -98,6 +99,9 @@ ESC_CHECK = bytes.fromhex(
+     "a1aa53b1f775a15575a1aa43b11080fed2808bc58ac489c288c1"
+     "02")
+ 
++ESC_CHECK_ROW1 = ESC_CHECK.replace(bytes.fromhex("d2 c0"), bytes.fromhex("d2 c1")).replace(
++    bytes.fromhex("20 c0"), bytes.fromhex("20 c1"))
++
+ KNOWN = {   # sha256 of the raw (unpadded) app image -> label
+     "75eb9250cb7842b82220cb1ffb7374042d49a7461b076ee79e0ea5fdaabdaea4":
+         "K580 stock 1.04 app region, as read from one K580",
+@@ -120,7 +124,8 @@ def ljmp_target(img, off):
+ 
+ def load_image(path):
+     """Load a raw app image based at 0x2800, validate it, return (padded bytes, info dict)."""
+-    raw = open(path, "rb").read()
++    with open(path, "rb") as source:
++        raw = source.read()
+     if len(raw) == 0x10000:
+         raise SystemExit("%s is a full 64 KB image; cut the app region first with 'extract'" % path)
+     errs = []
+@@ -139,7 +144,7 @@ def load_image(path):
+         errs.append("no LJMP into the app at 0x2800 (got %s)" % raw[:3].hex(" "))
+     elif not label:
+         off = entry - APP_BASE
+-        if raw[off:off + len(ESC_CHECK)] == ESC_CHECK:
++        if raw[off:off + len(ESC_CHECK)] in (ESC_CHECK, ESC_CHECK_ROW1):
+             app = ljmp_target(raw, off + len(ESC_CHECK) - 1)
+         if app is None or not (APP_BASE <= app < end):
+             errs.append("the LJMP at 0x2800 does not lead to the Esc check (without it a failing image can be "
+@@ -443,6 +448,7 @@ def do_flash(a):
+         raise SystemExit("bootloader not present")
+     node, dev = hit
+     fd = open_node(node)
++    reset_error = None
+     try:
+         try:
+             set_feature(fd, cmd_report(0x01)); time.sleep(0.1)
+@@ -464,14 +470,22 @@ def do_flash(a):
+         try:
+             set_feature(fd, cmd_report(0x05))
+         except OSError as e:
+-            raise SystemExit("checksum OK (boot marker written), but the reset failed: %s. Replug the board to "
+-                             "start the new firmware." % e)
++            # macOS can report a failed transfer when reset disconnects USB
++            # before the control request completes. Verify the new identity
++            # at the same physical port before deciding whether reset failed.
++            reset_error = e
+     finally:
+         close_node(fd)
+-    print("reset sent; waiting for %s at %s ..." % (names, usb_port(dev)), flush=True)
++    print("reset requested; waiting for %s at %s ..." % (names, usb_port(dev)), flush=True)
+     got = wait_usb_at(dev, ids, 30)
+     if not got:
++        if reset_error:
++            raise SystemExit("checksum OK (boot marker written), but reset reported %s and %s did not "
++                             "appear at %s within 30 s. Replug the board and run 'status'."
++                             % (reset_error, names, usb_port(dev)))
+         raise SystemExit("%s did not appear at %s within 30 s; run 'status'" % (names, usb_port(dev)))
++    if reset_error:
++        print("reset transfer reported %s; reboot independently confirmed by USB enumeration" % reset_error)
+     print("%04x:%04x enumerated" % got)
+     do_status(a)
+ 
+@@ -566,7 +580,8 @@ def store_sum(data):
+ 
+ def add_settings(img, info, path, ids):
+     """Return (image padded to 0xEFBF with the backup in the store's first slot, info) for flash --settings."""
+-    raw = open(path, "rb").read()
++    with open(path, "rb") as source:
++        raw = source.read()
+     if len(raw) < SETTINGS_HEADER.size:
+         raise SystemExit("%s is not a settings backup (too short)" % path)
+     magic, fmt, _, vid, pid, size, addr, layout = SETTINGS_HEADER.unpack_from(raw)
+diff --git a/util/evision_oem_image.py b/util/evision_oem_image.py
+index 92669a79..3c3315b3 100755
+--- a/util/evision_oem_image.py
++++ b/util/evision_oem_image.py
+@@ -9,7 +9,7 @@ also gets an Esc check that runs before the app:
+ 
+   0x2800  LJMP to the Esc check
+   check:  switch P4 to key-input mode (P4_LED_KEY/P4_MOD_OC = 0xFF; at reset P4 is in LED-drive mode),
+-          drive col 0 (P0.0) low push-pull, read row 0 (P4.0) = Esc;
++          drive col 0 (P0.0) low push-pull, read the configured row (P4.0 normally, P4.1 for K630) = Esc;
+           if Esc is pressed in all 64 samples (estimated at 12 MHz, the reset clock, which the OEM
+           bootloader does not change: about 2.7 ms settle delay, then about 5.5 ms of samples):
+           erase the 64-byte marker page 0x27C0 and do a software reset, so the board starts in the OEM
+@@ -46,8 +46,11 @@ ROM_ADDR_L, ROM_ADDR_H, ROM_DATA_HL, ROM_DATA_HH, ROM_CTRL = 0x84, 0x85, 0x8E, 0
+ bCODE_WE, bSW_RESET = 0x08, 0x10
+ MARKER_PAGE = 0x27C0
+ 
+-def esc_check(base, cont):
++def esc_check(base, cont, row=0):
+     """Assemble the Esc check at address base; returns (bytes, ret_addr)."""
++    if row not in (0, 1):
++        raise SystemExit("Esc row must be 0 (original boards) or 1 (K630)")
++    row_bit = P4_0 + row
+     code, labels, fix = bytearray(), {}, []
+     def emit(*b): code.extend(b)
+     def label(n): labels[n] = base + len(code)
+@@ -62,7 +65,7 @@ def esc_check(base, cont):
+         emit(0xA8 + rn, sfr)             # MOV Rn,sfr    (R0..R3)
+     emit(0x75, P4_LED_KEY, 0xFF)         # P4 -> key (GPIO input) mode
+     emit(0x75, P4_MOD_OC, 0xFF)          # P4 open-drain + pull-up
+-    emit(0xD2, P4_0)                     # SETB P4.0     row 0 released
++    emit(0xD2, row_bit)                     # SETB row      release selected row
+     emit(0x53, P0_MOD_OC, 0xFE)          # P0.0 push-pull ...
+     emit(0x43, P0_DIR_PU, 0x01)          # ... output
+     emit(0xC2, P0_0)                     # CLR P0.0      col 0 low
+@@ -71,7 +74,7 @@ def esc_check(base, cont):
+     label("d2"); emit(0xDF); rel("d2")   # DJNZ R7,d2
+     emit(0xDE); rel("d1")                # DJNZ R6,d1
+     emit(0x7D, 0x40)                     # MOV R5,#0x40  64 samples
+-    label("s"); emit(0x20, P4_0); rel("run")   # JB P4.0,run  (released -> normal boot)
++    label("s"); emit(0x20, row_bit); rel("run")   # JB row,run   (released -> normal boot)
+     emit(0x7F, 0x00)                     # MOV R7,#0
+     label("d3"); emit(0xDF); rel("d3")   # DJNZ R7,d3
+     emit(0xDD); rel("s")                 # DJNZ R5,s
+@@ -129,7 +132,7 @@ def do_stock(a):
+     entry = (img[1] << 8) | img[2]
+     last = max(i for i, b in enumerate(img) if b)
+     base = APP_BASE + ((last + 64) // 64) * 64        # first free 64-byte page after the app
+-    code, _ = esc_check(base, entry)
++    code, _ = esc_check(base, entry, a.esc_row)
+     place(img, base, code)
+     img[0:3] = ljmp(base)
+     print("Esc check at 0x%04x (%d bytes), then LJMP to original entry 0x%04x" % (base, len(code), entry))
+@@ -207,7 +210,7 @@ def do_sdcc(a):
+     for addr, b in mem.items():
+         img[addr - APP_BASE] = b
+     cbase = APP_BASE + 3
+-    code, ret = esc_check(cbase, code_loc)
++    code, ret = esc_check(cbase, code_loc, a.esc_row)
+     if cbase + len(code) > IVT_BASE:
+         raise SystemExit("Esc check too large")
+     img[3:3 + len(code)] = code
+@@ -229,6 +232,8 @@ def main():
+     p = sub.add_parser("sdcc"); p.add_argument("ihx"); p.add_argument("main_asm"); p.add_argument("out")
+     p.add_argument("--code-loc", default="0x3027")
+     p.add_argument("--code-end", default="0x%04x" % ERASE_END); p.set_defaults(fn=do_sdcc)
++    for parser in sub.choices.values():
++        parser.add_argument("--esc-row", type=int, choices=(0, 1), default=0)
+     a = ap.parse_args()
+     a.fn(a)
+ 

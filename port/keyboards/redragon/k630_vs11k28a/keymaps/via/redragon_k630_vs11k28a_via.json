@@ -1,0 +1,196 @@
+{
+  "name": "Redragon K630W-RGB VS11K28A (experimental QMK)",
+  "vendorId": "0x5244",
+  "productId": "0x0630",
+  "matrix": {
+    "rows": 6,
+    "cols": 16
+  },
+  "layouts": {
+    "keymap": [
+      [
+        "1,0",
+        "1,1",
+        "1,2",
+        "1,3",
+        "1,4",
+        "1,5",
+        "1,6",
+        "1,7",
+        "1,8",
+        "1,9",
+        "1,10",
+        "1,11",
+        "1,12",
+        {
+          "w": 2
+        },
+        "1,13"
+      ],
+      [
+        {
+          "w": 1.5
+        },
+        "2,0",
+        "2,1",
+        "2,2",
+        "2,3",
+        "2,4",
+        "2,5",
+        "2,6",
+        "2,7",
+        "2,8",
+        "2,9",
+        "2,10",
+        "2,11",
+        "2,12",
+        {
+          "w": 1.5
+        },
+        "2,13"
+      ],
+      [
+        {
+          "w": 1.75
+        },
+        "3,0",
+        "3,1",
+        "3,2",
+        "3,3",
+        "3,4",
+        "3,5",
+        "3,6",
+        "3,7",
+        "3,8",
+        "3,9",
+        "3,10",
+        "3,11",
+        {
+          "w": 2.25
+        },
+        "3,13"
+      ],
+      [
+        {
+          "w": 2.25
+        },
+        "4,0",
+        "4,2",
+        "4,3",
+        "4,4",
+        "4,5",
+        "4,6",
+        "4,7",
+        "4,8",
+        "4,9",
+        "4,10",
+        "4,11",
+        {
+          "w": 2.75
+        },
+        "4,13"
+      ],
+      [
+        {
+          "w": 1.25
+        },
+        "5,0",
+        {
+          "w": 1.25
+        },
+        "5,1",
+        {
+          "w": 1.25
+        },
+        "5,2",
+        {
+          "w": 6.25
+        },
+        "5,5",
+        {
+          "w": 1.25
+        },
+        "5,9",
+        {
+          "w": 1.25
+        },
+        "5,10",
+        {
+          "w": 1.25
+        },
+        "5,11",
+        {
+          "w": 1.25
+        },
+        "5,12"
+      ]
+    ]
+  },
+  "customKeycodes": [
+    {
+      "name": "Win Lock",
+      "title": "Windows keys off/on",
+      "shortName": "WinLk"
+    },
+    {
+      "name": "Key LED mode",
+      "title": "Next key LED effect (Shift: previous)",
+      "shortName": "KMod"
+    },
+    {
+      "name": "Key LED hue",
+      "title": "Key LED hue up (Shift: down)",
+      "shortName": "KHue"
+    },
+    {
+      "name": "Key LED saturation",
+      "title": "Key LED saturation up (Shift: down)",
+      "shortName": "KSat"
+    },
+    {
+      "name": "Key LED brightness",
+      "title": "Key LED brightness up (Shift: down)",
+      "shortName": "KVal"
+    },
+    {
+      "name": "Key LED speed",
+      "title": "Key LED effect speed up (Shift: down)",
+      "shortName": "KSpd"
+    },
+    {
+      "name": "Key LEDs on/off",
+      "title": "Key LEDs on/off",
+      "shortName": "KTog"
+    },
+    {
+      "name": "Toggle Windows / Mac",
+      "title": "Switch OS base layer and remember it (default: Fn+O)",
+      "shortName": "OS Tog"
+    },
+    {
+      "name": "Windows mode",
+      "title": "Select and remember Windows base layer 0",
+      "shortName": "Win OS"
+    },
+    {
+      "name": "Mac mode",
+      "title": "Select and remember Mac base layer 2",
+      "shortName": "Mac OS"
+    },
+    {
+      "name": "Toggle U.S. / EurKEY",
+      "title": "Toggle and remember the Mac input profile (default: Fn+I); match the computer input source",
+      "shortName": "US/Eur"
+    },
+    {
+      "name": "U.S. layout",
+      "title": "Use firmware umlaut sequences for a Mac with U.S. selected; remember this choice",
+      "shortName": "US Kbd"
+    },
+    {
+      "name": "EurKEY layout",
+      "title": "Pass Option+A/O/U to the Mac EurKEY layout unchanged; remember this choice",
+      "shortName": "EurKbd"
+    }
+  ]
+}
