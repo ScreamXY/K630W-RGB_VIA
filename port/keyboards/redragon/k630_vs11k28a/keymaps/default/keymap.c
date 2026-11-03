@@ -13,8 +13,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,
         _______, KC_VOLD, KC_UP,   KC_VOLU, RD_KHUE, RD_KSAT, RD_KSPD, _______, _______, K630_OS_TOGGLE, KC_PSCR, KC_INS, KC_DEL, KC_PAUS,
         _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, KC_HOME, KC_END,           _______,
-        _______,          RD_KMODE,RD_KTOG,KC_MUTE, RD_KVAL, _______, _______, _______, _______, KC_PGUP, KC_PGDN,          _______,
-        _______, _______, KC_MPRV,                            KC_MPLY,                            KC_MNXT, _______, _______, _______
+        _______,          RD_KMODE,RD_KTOG,KC_MUTE, RD_KVAL, _______, _______, RD_KVAL, RD_KSPD, KC_PGUP, KC_PGDN,          _______,
+        _______, RD_WINLK,_______,                            RD_KHUE,                            RD_KMODE,_______, _______, _______
     ),
     [K630_MAC] = LAYOUT_60_ansi(
         KC_ESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC,
@@ -27,8 +27,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_GRV,  KC_F14,  KC_F15,  KC_MCTL, KC_LPAD, KC_BRID, KC_BRIU, KC_MPRV, KC_MPLY, KC_MNXT, KC_MUTE, KC_VOLD, KC_VOLU, KC_DEL,
         _______, KC_VOLD, KC_UP,   KC_VOLU, RD_KHUE, RD_KSAT, RD_KSPD, _______, K630_LAYOUT_TOGGLE, K630_OS_TOGGLE, KC_PSCR, KC_INS, KC_DEL, KC_PAUS,
         _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, KC_HOME, KC_END,           _______,
-        _______,          RD_KMODE,RD_KTOG,KC_MUTE, RD_KVAL, _______, _______, _______, _______, KC_PGUP, KC_PGDN,          _______,
-        _______, _______, KC_MPRV,                            KC_MPLY,                            KC_MNXT, _______, MO(K630_MAC_FKEYS), _______
+        _______,          RD_KMODE,RD_KTOG,KC_MUTE, RD_KVAL, _______, _______, RD_KVAL, RD_KSPD, KC_PGUP, KC_PGDN,          _______,
+        _______, _______, _______,                            RD_KHUE,                            RD_KMODE,_______, MO(K630_MAC_FKEYS), _______
     ),
     [K630_MAC_FKEYS] = LAYOUT_60_ansi(
         _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______,

@@ -15,7 +15,8 @@ void keyboard_post_init_kb(void) {
 
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
     return process_record_user(keycode, record) && k630_process_os_keycode(keycode, record) &&
-           k630_process_umlaut(keycode, record) && redragon_process_record(keycode, record);
+           k630_process_umlaut(keycode, record) &&
+           (k630_win_lock_exempt(keycode) || redragon_process_record(keycode, record));
 }
 
 void housekeeping_task_kb(void) {

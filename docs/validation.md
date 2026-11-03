@@ -30,6 +30,7 @@ The local manifest records the hash of each newly built artifact and marks it `h
 
 ## Outstanding hardware checks
 
+- Keycap-legend Fn shortcuts added after v0.4.0: Fn+Win lock and its Mac-mode exemption, Fn+M/comma, Fn+Right Alt/Space. These changes have only been checked offline.
 - A complete physical key sweep, beyond matrix/ROM comparison and the exercised keys.
 - Macro recording/playback, including edge cases.
 - Suspend/wake and long-duration behavior across hosts/hubs.

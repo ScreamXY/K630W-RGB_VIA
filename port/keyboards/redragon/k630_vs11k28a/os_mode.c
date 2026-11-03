@@ -33,6 +33,12 @@ bool k630_process_os_keycode(uint16_t keycode, keyrecord_t *record) {
     return false;
 }
 
+bool k630_win_lock_exempt(uint16_t keycode) {
+    // Win Lock (Windows Fn+Win) blocks GUI keycodes, which are Command in Mac
+    // mode. A lock left on before Fn+O must not disable Mac shortcuts.
+    return (keycode == KC_LGUI || keycode == KC_RGUI) && os_base_layer() == K630_MAC;
+}
+
 #ifdef VIA_ENABLE
 void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
     // Read-only diagnostics on channel 'K': 1 = OS, 2 = Mac input profile.

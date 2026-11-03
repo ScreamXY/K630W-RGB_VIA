@@ -51,20 +51,31 @@ These are keyboard/consumer usages; their effect depends on macOS version, displ
 
 Both OS modes provide these Fn shortcuts:
 
-| Keys                         | Action                                    |
-| ---------------------------- | ----------------------------------------- |
-| W / A / S / D                | Up / Left / Down / Right                  |
-| H / J / K / L                | Left / Down / Up / Right                  |
-| Esc / Backspace              | Grave / Delete                            |
-| ; / '                        | Home / End                                |
-| . / /                        | Page Up / Page Down                       |
-| P / [ / ] / Backslash        | Print Screen / Insert / Delete / Pause    |
-| Q / E / C                    | Volume down / Volume up / Mute            |
-| Left Alt / Space / Right Alt | Previous track / Play-pause / Next track  |
-| Z / X                        | LED effect / LEDs on-off                  |
-| R / T / Y / V                | LED hue / saturation / speed / brightness |
+| Keys                  | Action                                    |
+| --------------------- | ----------------------------------------- |
+| W / A / S / D         | Up / Left / Down / Right                  |
+| H / J / K / L         | Left / Down / Up / Right                  |
+| Esc / Backspace       | Grave / Delete                            |
+| ; / '                 | Home / End                                |
+| . / /                 | Page Up / Page Down                       |
+| P / [ / ] / Backslash | Print Screen / Insert / Delete / Pause    |
+| Q / E / C             | Volume down / Volume up / Mute            |
+| Right Alt / Space     | LED effect / LED hue                      |
+| M / ,                 | LED brightness / LED speed                |
+| Z / X                 | LED effect / LEDs on-off                  |
+| R / T / Y / V         | LED hue / saturation / speed / brightness |
+| Left Win              | Win lock (Windows mode only)              |
 
-Hold Shift to step a lighting setting backwards. The initial LED intensity is reduced from the upstream default; actual current draw has not been measured. Indicator LEDs are not enabled. There is no VIA lighting settings panel.
+The stock keycap legends are on Esc, the number row, W/A/S/D, [ ] ; ' . /, M, comma, Space, Right Alt and Win. They match the factory Fn table and are all mapped. The other shortcuts are additions. Two stock behaviors differ:
+
+- **Fn+Space** steps the hue for all keys. The stock firmware instead entered a color-picking mode where the next key pressed chose the color.
+- **Holding Fn+Esc for 3 seconds** does not reset the keyboard; Fn+Esc only sends Grave. This port has no tap-hold.
+
+Track control is available in Mac mode on Fn+7/8/9. Windows mode has no Fn shortcuts for Previous, Play/Pause or Next. Assign them in VIA if needed.
+
+Win lock blocks the Windows keys until Fn+Win is pressed again. It is not saved, has no indicator LED, and is ignored in Mac mode, so Command keeps working after Fn+O. In Mac mode, Fn+Win remains Option.
+
+Hold Shift to step a lighting setting backwards. Brightness and speed stop at their limits; effect and hue wrap around. The initial LED intensity is reduced from the upstream default; actual current draw has not been measured. Indicator LEDs are not enabled. There is no VIA lighting settings panel.
 
 ## U.S. and EurKEY profiles
 
@@ -84,7 +95,7 @@ VIA's **Custom** category provides:
 
 | Index   | Label                              | Action                                      |
 | ------- | ---------------------------------- | ------------------------------------------- |
-| 0       | WinLk                              | Windows-key lock                            |
+| 0       | WinLk                              | Windows-key lock; default Windows Fn+Win    |
 | 1–6     | KMod, KHue, KSat, KVal, KSpd, KTog | Lighting controls                           |
 | 7       | OS Tog                             | Toggle Windows/Mac; default Fn+O            |
 | 8 / 9   | Win OS / Mac OS                    | Explicit persistent OS selection            |

@@ -58,7 +58,7 @@ Its EurKEY input-source ID is `org.unknown.keylayout.EurKEYv12`. A different Eur
 | ------------------------------- | ------------------------------------------------------------------- |
 | `keyboard.json`, `led_fx_pos.h` | Physical matrix and LED positions                                   |
 | `keymaps/default/keymap.c`      | Five default layers, reused by the VIA keymap                       |
-| `os_mode.c`                     | Persistent Windows/Mac selection; read-only VIA diagnostics         |
+| `os_mode.c`                     | Persistent Windows/Mac selection; Win-lock scope; VIA diagnostics   |
 | `umlaut.c`                      | Saved Mac input profile; U.S. composition and EurKEY pass-through   |
 | `k630_vs11k28a.c`               | Board initialization, key-handler chain, lighting and suspend hooks |
 | `keymaps/via/config.h`          | Five-layer storage version and firmware version                     |

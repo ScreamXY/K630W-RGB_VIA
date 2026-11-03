@@ -107,6 +107,15 @@ class PortChecks(unittest.TestCase):
         for c in range(1, 13):
             self.assertEqual(maps["K630_MAC_FKEYS"][1, c], "KC_F" + str(c))
             self.assertEqual(maps["K630_WINDOWS_FN"][1, c], "KC_F" + str(c))
+        # Fn legends printed on the stock keycaps (stock ROM Fn table at 0x61A0).
+        keycaps = {(1, 0): "KC_GRV", (2, 11): "KC_INS", (2, 12): "KC_DEL", (3, 10): "KC_HOME",
+                   (3, 11): "KC_END", (4, 10): "KC_PGUP", (4, 11): "KC_PGDN", (4, 8): "RD_KVAL",
+                   (4, 9): "RD_KSPD", (5, 5): "RD_KHUE", (5, 9): "RD_KMODE"}
+        for name in ("K630_WINDOWS_FN", "K630_MAC_FN"):
+            self.assertEqual({p: maps[name][p] for p in keycaps}, keycaps)
+            self.assertEqual(maps[name][5, 2], "_______")
+        self.assertEqual(maps["K630_WINDOWS_FN"][5, 1], "RD_WINLK")
+        self.assertEqual(maps["K630_MAC_FN"][5, 1], "_______", "Fn+Win stays Option in Mac mode")
         for pos, code in maps["K630_MAC_FKEYS"].items():
             if pos[0] != 1 or not 1 <= pos[1] <= 12:
                 self.assertEqual(code, "_______", "Fn, Hyper and arrows must fall through")

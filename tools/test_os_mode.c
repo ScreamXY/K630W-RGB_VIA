@@ -31,12 +31,16 @@ static bool event(uint16_t code, bool pressed) {
 }
 int main(void) {
     assert(event(4, true)); // A and ordinary keys pass through untouched.
+    // Win Lock applies in Windows mode only; Mac Command must never be locked.
+    assert(!k630_win_lock_exempt(KC_LGUI) && !k630_win_lock_exempt(KC_RGUI));
     assert(!event(K630_OS_WINDOWS, true) && saves == 0);
     active_layers = 1 << K630_WINDOWS_FN;
     held_modifiers = 0x08; held_keys = 1;
     assert(!event(K630_OS_TOGGLE, true));
     assert(default_layer_state == 4 && saved_layer == 4 && saves == 1);
     assert(!active_layers && !held_modifiers && !held_keys);
+    assert(k630_win_lock_exempt(KC_LGUI) && k630_win_lock_exempt(KC_RGUI));
+    assert(!k630_win_lock_exempt(KC_LALT) && !k630_win_lock_exempt(KC_A));
     assert(!event(K630_OS_TOGGLE, false) && saves == 1); // Release must not toggle back.
     default_layer_state = saved_layer; // Reboot reloads QMK's persisted default.
     uint8_t status[32] = {8, 0x4b, 1};
@@ -74,5 +78,5 @@ int main(void) {
     uint8_t unknown[32] = {8, 0x4b, 3};
     via_custom_value_command_kb(unknown, sizeof(unknown));
     assert(unknown[0] == 255);
-    puts("OS switching: both directions, saved state, held keys/Fn cleanup, release, and read-only diagnostics passed.");
+    puts("OS switching: both directions, saved state, held keys/Fn cleanup, release, Win Lock scope, and read-only diagnostics passed.");
 }

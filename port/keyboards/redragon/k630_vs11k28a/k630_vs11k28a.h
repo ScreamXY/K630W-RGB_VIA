@@ -20,5 +20,6 @@ enum k630_keycodes {
 };
 
 bool k630_process_os_keycode(uint16_t keycode, keyrecord_t *record);
+bool k630_win_lock_exempt(uint16_t keycode);
 bool k630_process_umlaut(uint16_t keycode, keyrecord_t *record);
 bool k630_uses_eurkey(void);

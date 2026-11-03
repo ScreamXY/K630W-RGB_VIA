@@ -11,7 +11,7 @@ typedef struct { struct { bool pressed; struct { uint8_t row, col; } key; } even
 #define MOD_MASK_ALT 0x44
 #define MOD_MASK_GUI 0x88
 #define MOD_BIT(kc) (1U << ((kc) & 7))
-enum { KC_A = 4, KC_B = 5, KC_O = 18, KC_U = 24, KC_LALT = 0xe2 };
+enum { KC_A = 4, KC_B = 5, KC_O = 18, KC_U = 24, KC_LALT = 0xe2, KC_LGUI = 0xe3, KC_RGUI = 0xe7 };
 enum { RD_KB_SAFE_RANGE = 0x7e07 };
 extern layer_state_t default_layer_state;
 uint8_t get_highest_layer(layer_state_t state);
